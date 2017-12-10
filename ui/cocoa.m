@@ -423,8 +423,8 @@ QemuCocoaView *cocoaView;
     COCOA_DEBUG("QemuCocoaView: setContentDimensions\n");
 
     if (isFullscreen) {
-        cdx = [[NSScreen mainScreen] frame].size.width / (float)screen.width;
-        cdy = [[NSScreen mainScreen] frame].size.height / (float)screen.height;
+        cdx = [[[NSScreen screens] objectAtIndex:0] frame].size.width / (float)screen.width;
+        cdy = [[[NSScreen screens] objectAtIndex:0] frame].size.height / (float)screen.height;
 
         /* stretches video, but keeps same aspect ratio */
         if (stretch_video == true) {
@@ -439,8 +439,8 @@ QemuCocoaView *cocoaView;
         }
         cw = screen.width * cdx;
         ch = screen.height * cdy;
-        cx = ([[NSScreen mainScreen] frame].size.width - cw) / 2.0;
-        cy = ([[NSScreen mainScreen] frame].size.height - ch) / 2.0;
+        cx = ([[[NSScreen screens] objectAtIndex:0] frame].size.width - cw) / 2.0;
+        cy = ([[[NSScreen screens] objectAtIndex:0] frame].size.height - ch) / 2.0;
     } else {
         cx = 0;
         cy = 0;
@@ -485,7 +485,7 @@ QemuCocoaView *cocoaView;
 
     // update windows
     if (isFullscreen) {
-        [[fullScreenWindow contentView] setFrame:[[NSScreen mainScreen] frame]];
+        [[fullScreenWindow contentView] setFrame:[[[NSScreen screens] objectAtIndex:0] frame]];
         [normalWindow setFrame:NSMakeRect([normalWindow frame].origin.x, [normalWindow frame].origin.y - h + oldh, w, h + [normalWindow frame].size.height - oldh) display:NO animate:NO];
     } else {
         if (qemu_name)
@@ -520,13 +520,13 @@ QemuCocoaView *cocoaView;
         [self grabMouse];
         [self setContentDimensions];
         if ([NSView respondsToSelector:@selector(enterFullScreenMode:withOptions:)]) { // test if "enterFullScreenMode:withOptions" is supported on host at runtime
-            [self enterFullScreenMode:[NSScreen mainScreen] withOptions:[NSDictionary dictionaryWithObjectsAndKeys:
+            [self enterFullScreenMode:[[NSScreen screens] objectAtIndex:0] withOptions:[NSDictionary dictionaryWithObjectsAndKeys:
                 [NSNumber numberWithBool:NO], NSFullScreenModeAllScreens,
                 [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithBool:NO], kCGDisplayModeIsStretched, nil], NSFullScreenModeSetting,
                  nil]];
         } else {
             [NSMenu setMenuBarVisible:NO];
-            fullScreenWindow = [[NSWindow alloc] initWithContentRect:[[NSScreen mainScreen] frame]
+            fullScreenWindow = [[NSWindow alloc] initWithContentRect:[[[NSScreen screens] objectAtIndex:0] frame]
                 styleMask:NSWindowStyleMaskBorderless
                 backing:NSBackingStoreBuffered
                 defer:NO];
